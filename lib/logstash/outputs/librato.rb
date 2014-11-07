@@ -23,8 +23,10 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   # Send data to Librato as a gauge
   #
   # Example:
+  # [source,ruby]
   #   ["value", "%{bytes_recieved}", "source", "%{host}", "name", "apache_bytes"]
   # Additionally, you can override the `measure_time` for the event. Must be a unix timestamp:
+  # [source,ruby]
   #   ["value", "%{bytes_recieved}", "source", "%{host}", "name", "apache_bytes","measure_time", "%{my_unixtime_field}]
   # Default is to use the event's timestamp
   config :gauge, :validate => :hash, :default => {}
@@ -33,8 +35,10 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   # Send data to Librato as a counter
   #
   # Example:
+  # [source,ruby]
   #   ["value", "1", "source", "%{host}", "name", "messages_received"]
   # Additionally, you can override the `measure_time` for the event. Must be a unix timestamp:
+  # [source,ruby]
   #   ["value", "1", "source", "%{host}", "name", "messages_received", "measure_time", "%{my_unixtime_field}"]
   # Default is to use the event's timestamp
   config :counter, :validate => :hash, :default => {}
@@ -47,8 +51,10 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   # All values will be passed through `event.sprintf`
   #
   # Example:
+  # [source,ruby]
   #   ["title":"Logstash event on %{host}", "name":"logstash_stream"]
   # or
+  # [source,ruby]
   #   ["title":"Logstash event", "description":"%{message}", "name":"logstash_stream"]
   config :annotation, :validate => :hash, :default => {}
 
