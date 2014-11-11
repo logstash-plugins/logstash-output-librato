@@ -1,12 +1,13 @@
 # encoding: utf-8
 require "logstash/outputs/base"
 require "logstash/namespace"
+require "logstash/json"
 
 
 class LogStash::Outputs::Librato < LogStash::Outputs::Base
   # This output lets you send metrics, annotations and alerts to
   # Librato based on Logstash events
-  # 
+  #
   # This is VERY experimental and inefficient right now.
 
   config_name "librato"
@@ -72,7 +73,7 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
     @client = Net::HTTP.new(@uri.host, @uri.port)
     @client.use_ssl = true
     @client.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    
+
   end # def register
 
   public
@@ -87,9 +88,9 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
       g_hash.each do |k,v|
         g_hash[k] = v.to_f if k=="value"
       end
-      g_hash['measure_time'] = event["@timestamp"].to_i unless g_hash['measure_time']
+      g_hash['measure_time'] = event.timestamp.to_i unless g_hash['measure_time']
       @logger.warn("Gauges hash", :data => g_hash)
-      metrics_event['gauges'] = Array.new 
+      metrics_event['gauges'] = Array.new
       metrics_event['gauges'] << g_hash
       @logger.warn("Metrics hash", :data => metrics_event)
     end
@@ -98,21 +99,21 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
       c_hash.each do |k,v|
         c_hash[k] = v.to_f if k=="value"
       end
-      c_hash['measure_time'] = event["@timestamp"].to_i unless c_hash['measure_time']
+      c_hash['measure_time'] = event.timestamp.to_i unless c_hash['measure_time']
       @logger.warn("Counters hash", :data => c_hash)
       metrics_event['counters'] = Array.new
       metrics_event['counters'] << c_hash
       @logger.warn("Metrics hash", :data => metrics_event)
     end
-   
+
     # TODO (lusis)
     # Clean this mess up
     unless metrics_event.size == 0
       request = Net::HTTP::Post.new(@uri.path+"metrics")
       request.basic_auth(@account_id, @api_token)
-      
+
       begin
-        request.body = metrics_event.to_json
+        request.body = LogStash::Json.dump(metrics_event)
         request.add_field("Content-Type", 'application/json')
         response = @client.request(request)
         @logger.warn("Librato convo", :request => request.inspect, :response => response.inspect)
@@ -128,19 +129,19 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
       @logger.warn("Original Annotation", :data => @annotation)
       annotation_event = Hash[*@annotation.collect{|k,v| [event.sprintf(k),event.sprintf(v)]}.flatten]
       @logger.warn("Annotation event", :data => annotation_event)
-      
+
       annotation_path = "#{@uri.path}annotations/#{annotation_event['name']}"
       @logger.warn("Annotation path", :data => annotation_path)
       request = Net::HTTP::Post.new(annotation_path)
       request.basic_auth(@account_id, @api_token)
       annotation_event.delete('name')
-      annotation_event['start_time'] = event["@timestamp"].to_i unless annotation_event['start_time']
-      annotation_event['end_time'] = event["@timestamp"].to_i unless annotation_event['end_time']
+      annotation_event['start_time'] = event.timestamp.to_i unless annotation_event['start_time']
+      annotation_event['end_time'] = event.timestamp.to_i unless annotation_event['end_time']
       annotation_hash['annotations'] << annotation_event
       @logger.warn("Annotation event", :data => annotation_event)
 
       begin
-        request.body = annotation_event.to_json
+        request.body = LogStash::Json.dump(annotation_event)
         request.add_field("Content-Type", 'application/json')
         response = @client.request(request)
         @logger.warn("Librato convo", :request => request.inspect, :response => response.inspect)
