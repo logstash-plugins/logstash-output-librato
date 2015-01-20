@@ -10,7 +10,6 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   # This is VERY experimental and inefficient right now.
 
   config_name "librato"
-  milestone 1
 
   # Your Librato account
   # usually an email address
