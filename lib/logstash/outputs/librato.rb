@@ -104,7 +104,7 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   def receive(event)
     # TODO (lusis)
     # batch and flush
-    return unless output?(event)
+    
 
     metrics_event = Hash.new
     unless @gauge.size == 0
