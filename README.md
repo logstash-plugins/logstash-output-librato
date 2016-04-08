@@ -1,7 +1,6 @@
 # Logstash Plugin
 
-[![Build
-Status](http://build-eu-00.elastic.co/view/LS%20Plugins/view/LS%20Outputs/job/logstash-plugin-output-librato-unit/badge/icon)](http://build-eu-00.elastic.co/view/LS%20Plugins/view/LS%20Outputs/job/logstash-plugin-output-librato-unit/)
+[![Travis Build Status](https://travis-ci.org/logstash-plugins/logstash-output-librato.svg)](https://travis-ci.org/logstash-plugins/logstash-output-librato)
 
 This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
