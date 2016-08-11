@@ -49,7 +49,7 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   #         "source" => "%{host}"
   #         "name" => "messages_received"
   #     }
-  #     
+  #
   # Additionally, you can override the `measure_time` for the event. Must be a unix timestamp:
   # [source,ruby]
   #     {
@@ -104,7 +104,7 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   def receive(event)
     # TODO (lusis)
     # batch and flush
-    
+
 
     metrics_event = Hash.new
     unless @gauge.size == 0
@@ -113,10 +113,10 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
         g_hash[k] = v.to_f if k=="value"
       end
       g_hash['measure_time'] = event.timestamp.to_i unless g_hash['measure_time']
-      @logger.warn("Gauges hash", :data => g_hash)
+      @logger.debug("Gauges hash", :data => g_hash)
       metrics_event['gauges'] = Array.new
       metrics_event['gauges'] << g_hash
-      @logger.warn("Metrics hash", :data => metrics_event)
+      @logger.debug("Metrics hash", :data => metrics_event)
     end
     unless @counter.size == 0
       c_hash = Hash[*@counter.collect{|k,v| [k,event.sprintf(v)]}.flatten]
@@ -124,10 +124,10 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
         c_hash[k] = v.to_f if k=="value"
       end
       c_hash['measure_time'] = event.timestamp.to_i unless c_hash['measure_time']
-      @logger.warn("Counters hash", :data => c_hash)
+      @logger.debug("Counters hash", :data => c_hash)
       metrics_event['counters'] = Array.new
       metrics_event['counters'] << c_hash
-      @logger.warn("Metrics hash", :data => metrics_event)
+      @logger.debug("Metrics hash", :data => metrics_event)
     end
 
     # TODO (lusis)
@@ -140,7 +140,7 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
         request.body = LogStash::Json.dump(metrics_event)
         request.add_field("Content-Type", 'application/json')
         response = @client.request(request)
-        @logger.warn("Librato convo", :request => request.inspect, :response => response.inspect)
+        @logger.debug("Librato convo", :request => request.inspect, :response => response.inspect)
         raise unless response.code == '200'
       rescue Exception => e
         @logger.warn("Unhandled exception", :request => request.inspect, :response => response.inspect, :exception => e.inspect)
@@ -150,25 +150,25 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
     unless @annotation.size == 0
       annotation_hash = Hash.new
       annotation_hash['annotations'] = Array.new
-      @logger.warn("Original Annotation", :data => @annotation)
+      @logger.debug("Original Annotation", :data => @annotation)
       annotation_event = Hash[*@annotation.collect{|k,v| [event.sprintf(k),event.sprintf(v)]}.flatten]
-      @logger.warn("Annotation event", :data => annotation_event)
+      @logger.debug("Annotation event", :data => annotation_event)
 
       annotation_path = "#{@uri.path}annotations/#{annotation_event['name']}"
-      @logger.warn("Annotation path", :data => annotation_path)
+      @logger.debug("Annotation path", :data => annotation_path)
       request = Net::HTTP::Post.new(annotation_path)
       request.basic_auth(@account_id, @api_token)
       annotation_event.delete('name')
       annotation_event['start_time'] = event.timestamp.to_i unless annotation_event['start_time']
       annotation_event['end_time'] = event.timestamp.to_i unless annotation_event['end_time']
       annotation_hash['annotations'] << annotation_event
-      @logger.warn("Annotation event", :data => annotation_event)
+      @logger.debug("Annotation event", :data => annotation_event)
 
       begin
         request.body = LogStash::Json.dump(annotation_event)
         request.add_field("Content-Type", 'application/json')
         response = @client.request(request)
-        @logger.warn("Librato convo", :request => request.inspect, :response => response.inspect)
+        @logger.debug("Librato convo", :request => request.inspect, :response => response.inspect)
         raise unless response.code == '201'
       rescue Exception => e
         @logger.warn("Unhandled exception", :request => request.inspect, :response => response.inspect, :exception => e.inspect)
