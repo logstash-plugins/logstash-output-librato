@@ -1,3 +1,7 @@
+# 3.0.1
+  - Docs: Update doc example to use new event API syntax 
+# 3.0.0
+  - Update plugin to the new event API
 # 2.0.4
   - Depend on logstash-core-plugin-api instead of logstash-core, removing the need to mass update plugins on major releases of logstash
 # 2.0.3
