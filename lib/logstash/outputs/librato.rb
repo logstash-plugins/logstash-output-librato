@@ -64,7 +64,7 @@ class LogStash::Outputs::Librato < LogStash::Outputs::Base
   # Annotations
   # Registers an annotation with Librato
   # The only required field is `title` and `name`.
-  # `start_time` and `end_time` will be set to `event["@timestamp"].to_i`
+  # `start_time` and `end_time` will be set to `event.get("@timestamp").to_i`
   # You can add any other optional annotation values as well.
   # All values will be passed through `event.sprintf`
   #
