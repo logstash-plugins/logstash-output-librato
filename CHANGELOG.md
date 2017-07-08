@@ -1,3 +1,7 @@
+# 3.0.3
+  - Docs: Add plugin description
+# 3.0.2
+  - Docs: Fix plugin ID
 # 3.0.1
   - Docs: Update doc example to use new event API syntax 
 # 3.0.0
