@@ -1,3 +1,6 @@
+## 3.0.7
+  - Fix formatting in doc for conversion to --asciidoctor [#9](https://github.com/logstash-plugins/logstash-output-librato/pull/9)
+
 ## 3.0.6
   - Docs: Set the default_codec doc attribute.
 
